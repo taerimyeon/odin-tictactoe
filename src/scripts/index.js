@@ -1,3 +1,6 @@
+let playerOne, playerTwo
+let turn = "playerOne"
+
 const gameBoard = (function Gameboard() {
   let gameTurnCount = 0;
   let gameBoardData = [
@@ -21,13 +24,13 @@ const gameBoard = (function Gameboard() {
         if (isPlayerWin) {
           return {
             result: "finished",
-            message: `${player.name} win!`
+            message: `${player.name} win! 🥳`
           }
         } 
         if (!isPlayerWin && isGameboardFull) {
           return {
             result: "finished",
-            message: "It's a tie!"
+            message: "It's a tie! ✌️"
           }
         }
         return {
@@ -115,20 +118,32 @@ const displayController = (function DisplayController() {
       console.error("[#setGridMarker] error: ", error);
     }
   }
+  const resetGridDisplay = () => {
+    const gridElements = document.getElementsByClassName("gameboard-grid-item");
+    if (gridElements) {
+      for (const gridElement of gridElements) {
+        gridElement.textContent = "";
+      }
+    }
+  }
   // Expose the function(s) outside
   return {
-    setGridMarker
+    setGridMarker,
+    resetGridDisplay
   }
 })()
 
 function playGame(event) {
+  const outputGameInfo = document.getElementById("output-game-info");
   let result
   if (turn === "playerOne") {
     result = displayController.setGridMarker(playerOne, event);
     console.log(result);
+    outputGameInfo.value = result.message;
   } else {
     result = displayController.setGridMarker(playerTwo, event);
     console.log(result);
+    outputGameInfo.value = result.message;
   }
   if (result.result === "finished") removeGridEventListener();
   if (result.result === "ongoing") turn = turn === "playerOne" ? "playerTwo" : "playerOne";
@@ -152,6 +167,20 @@ function removeGridEventListener() {
   }
 }
 
+function showStartButton() {
+  const buttonStartGame = document.getElementById("button-start-game");
+  const buttonResetGame = document.getElementById("button-reset-game");
+  buttonStartGame.style.display = "block";
+  buttonResetGame.style.display = "none";
+}
+
+function showResetButton() {
+  const buttonStartGame = document.getElementById("button-start-game");
+  const buttonResetGame = document.getElementById("button-reset-game");
+  buttonStartGame.style.display = "none";
+  buttonResetGame.style.display = "block";
+}
+
 function createPlayer(playerName, playerMarker) {
   if (playerMarker !== "O" && playerMarker !== "X") {
     return {
@@ -169,9 +198,54 @@ function createPlayer(playerName, playerMarker) {
   }
 }
 
-const playerOne = createPlayer("Player_1", "X")
-const playerTwo = createPlayer("Player_2", "O")
-let turn = "playerOne"
-
 // On DOM mounted
-document.addEventListener("DOMContentLoaded", addGridEventListener)
+document.addEventListener("DOMContentLoaded", function() {
+  const inputPlayerOne = document.getElementById("input-player-one");
+  const inputPlayerTwo = document.getElementById("input-player-two");
+  const outputGameInfo = document.getElementById("output-game-info");
+  const buttonStartGame = document.getElementById("button-start-game");
+  const buttonResetGame = document.getElementById("button-reset-game");
+  const buttonDialogConfirm = document.getElementById("button-dialog-confirm");
+  const buttonDialogCancel = document.getElementById("button-dialog-cancel");
+  const dialogConfirm = document.getElementById("dialog-confirm");
+  const textDialog = document.getElementById("dialog-text");
+  buttonStartGame.addEventListener("click", () => {
+    if (playerOne || playerTwo) {
+      outputGameInfo.value = "Game on!";
+      addGridEventListener();
+      showResetButton();
+      return
+    }
+    playerOne = createPlayer(inputPlayerOne.value, "X");
+    playerTwo = createPlayer(inputPlayerTwo.value, "O");
+    if (playerOne.error !== undefined) {
+      console.error("Can't use empty name for 'Player 1'!");
+      outputGameInfo.value = "Can't use empty name for 'Player 1'!";
+      return
+    }
+    if (playerTwo.error !== undefined) {
+      console.error("Can't use empty name for 'Player 2'!");
+      outputGameInfo.value = "Can't use empty name for 'Player 2'!";
+      return
+    }
+    outputGameInfo.value = "Game on!";
+    addGridEventListener();
+    showResetButton();
+  });
+  buttonResetGame.addEventListener("click", () => {
+    textDialog.textContent = "Are you sure you want to reset the game?";
+    dialogConfirm.showModal(); // Show confirm dialog
+  });
+  buttonDialogConfirm.addEventListener("click", () => {
+    turn = "playerOne";
+    displayController.resetGridDisplay();
+    gameBoard.resetGameboard();
+    outputGameInfo.value = "Game board reset!";
+    removeGridEventListener();
+    showStartButton();
+    dialogConfirm.close(); // Close confirm dialog
+  });
+  buttonDialogCancel.addEventListener("click", () => {
+    dialogConfirm.close(); // Close confirm dialog
+  });
+})

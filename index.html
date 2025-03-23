@@ -7,6 +7,32 @@
     <script src="./src/scripts/index.js"></script>
   </head>
   <body>
+    <div class="game-input-form">
+      <div class="container-input-form">
+        <label>Player 1</label>
+        <input id="input-player-one" name="input-player-one" class="player-input-form">
+      </div>
+      <div class="container-input-form">
+        <label>Player 2</label>
+        <input id="input-player-two" name="input-player-two" class="player-input-form">
+      </div>
+      <div class="button-container">
+        <button id="button-start-game" class="button-start-game">Start Game</button>
+        <button id="button-reset-game" class="button-reset-game">Reset Game</button>
+      </div>
+    </div>
+    <dialog id="dialog-confirm" class="dialog-confirm">
+      <div id="dialog-element-container" class="dialog-element-container">
+        <p id="dialog-text" class="dialog-text">
+        </p>
+        <button id="button-dialog-cancel" class="button-dialog-cancel">
+          Cancel
+        </button>
+        <button id="button-dialog-confirm" class="button-dialog-confirm">
+          OK
+        </button>
+      </div>
+    </dialog>
     <div id="gameboard-grid" class="gameboard-grid">
       <span id="gameboard-grid-one" class="gameboard-grid-item"></span>
       <span id="gameboard-grid-two" class="gameboard-grid-item"></span>
@@ -18,5 +44,7 @@
       <span id="gameboard-grid-eight" class="gameboard-grid-item"></span>
       <span id="gameboard-grid-nine" class="gameboard-grid-item"></span>
     </div>
+    <output id="output-game-info" class="output-game-info">
+    </output>
   </body>
 </html>
